@@ -12,68 +12,79 @@ import { AdminDasboardPage } from "../admin/pages/dashboard/AdminDasboardPage";
 import { AdminProductsPage } from "../admin/pages/products/AdminProductsPage";
 import { AdminProductPage } from "../admin/pages/product/AdminProductPage";
 import { lazy } from "react";
+import {
+  NoAuthenticatedRoute,
+  AdminRoute,
+} from "../components/routes/ProtectedRoutes";
 
 const AuthLayout = lazy(() => import("../auth/layouts/AuthLayout"));
-const AdminLayout = lazy(() => import('../admin/layouts/AdminLayout'));
-
+const AdminLayout = lazy(() => import("../admin/layouts/AdminLayout"));
 
 export const appRouter = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <ShopLayout />,
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
-        path: 'product/:idSlug',
-        element: <ProductPage />
+        path: "product/:idSlug",
+        element: <ProductPage />,
       },
       {
-        path: 'gender/:gender',
-        element: <GenderPage />
-      }
-    ]
+        path: "gender/:gender",
+        element: <GenderPage />,
+      },
+    ],
   },
   {
-    path: '/auth',
-    element: <AuthLayout />,
+    path: "/auth",
+    element: (
+      <NoAuthenticatedRoute>
+        <AuthLayout />
+      </NoAuthenticatedRoute>
+    ),
     children: [
       {
         index: true,
-        element: <Navigate to='/auth/login' />
+        element: <Navigate to="/auth/login" />,
       },
       {
-        path: 'login',
+        path: "login",
         element: <LoginPage />,
       },
       {
-        path: 'register',
-        element: <RegisterPage />
-      }
-    ]
+        path: "register",
+        element: <RegisterPage />,
+      },
+    ],
   },
   {
-    path: '/admin',
-    element: <AdminLayout />,
+    path: "/admin",
+    element: (
+      <AdminRoute>
+        <AdminLayout />
+      </AdminRoute>
+    ),
     children: [
       {
         index: true,
-        element: <AdminDasboardPage />
+        element: <AdminDasboardPage />,
       },
       {
-        path: 'products',
-        element: <AdminProductsPage />
+        path: "products",
+        element: <AdminProductsPage />,
       },
       {
-        path: 'product/:id',
-        element: <AdminProductPage />
-      }
-    ]
+        path: "product/:id",
+        element: <AdminProductPage />,
+      },
+    ],
   },
   {
-    path: '*',
-    element: <Navigate to='/' />
-  }
-])
+    path: "*",
+    element: <Navigate to="/" />,
+  },
+]);
