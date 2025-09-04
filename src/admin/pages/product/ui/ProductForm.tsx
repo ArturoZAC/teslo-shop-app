@@ -32,21 +32,23 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
   const labelInputRef = useRef<HTMLInputElement>(null);
 
   const selectedSizes = watch("sizes");
+  const selectedTags = watch("tags");
+  const currentStock = watch("stock");
 
   const addTag = () => {
-    if (newTag.trim() && !product.tags.includes(newTag.trim())) {
-      // setProduct((prev) => ({
-      //   ...prev,
-      //   tags: [...prev.tags, newTag.trim()],
-      // }));
-    }
+    const newTag = labelInputRef.current!.value;
+
+    if (newTag === "") return;
+
+    const newTagSet = new Set(getValues("tags"));
+    newTagSet.add(newTag);
+    setValue("tags", Array.from(newTagSet));
   };
 
-  const removeTag = (tagToRemove: string) => {
-    // setProduct((prev) => ({
-    //   ...prev,
-    //   tags: prev.tags.filter((tag) => tag !== tagToRemove),
-    // }));
+  const removeTag = (tag: string) => {
+    const newTagSet = new Set(getValues("tags"));
+    newTagSet.delete(tag);
+    setValue("tags", Array.from(newTagSet));
   };
 
   const addSize = (size: Size) => {
@@ -334,7 +336,7 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
 
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag) => (
+                  {selectedTags.map((tag) => (
                     <span
                       key={tag}
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200"
@@ -342,7 +344,7 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
                       <Tag className="h-3 w-3 mr-1" />
                       {tag}
                       <button
-                        // onClick={() => removeTag(tag)}
+                        onClick={() => removeTag(tag)}
                         className="ml-2 text-green-600 hover:text-green-800 transition-colors duration-200"
                       >
                         <X className="h-3 w-3" />
@@ -357,7 +359,9 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
                     type="text"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " " || e.key === ",") {
+                        e.preventDefault();
                         addTag();
+                        labelInputRef.current!.value = "";
                       }
                     }}
                     placeholder="Añadir nueva etiqueta..."
@@ -464,16 +468,16 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      product.stock > 5
+                      currentStock > 5
                         ? "bg-green-100 text-green-800"
-                        : product.stock > 0
+                        : currentStock > 0
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {product.stock > 5
+                    {currentStock > 5
                       ? "En stock"
-                      : product.stock > 0
+                      : currentStock > 0
                       ? "Bajo stock"
                       : "Sin stock"}
                   </span>
@@ -493,7 +497,7 @@ export const ProductForm = ({ title, subTitle, product }: Props) => {
                     Tallas disponibles
                   </span>
                   <span className="text-sm text-slate-600">
-                    {product.sizes.length} tallas
+                    {selectedSizes.length} tallas
                   </span>
                 </div>
               </div>
